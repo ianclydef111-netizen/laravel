@@ -29,14 +29,12 @@
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table mb-0">
-                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead>
+<thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead>
                 <tbody>
                 @forelse($users as $user)
                 <tr>
-                    <td class="fw-bold">
-{{ $user->user_id_number_display }}
-                        <br><small class="text-muted">{{ $user->name }}</small>
-                    </td>
+                    <td><span class="badge bg-primary">{{ $user->user_id_number_display }}</span></td>
+                    <td class="fw-bold">{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
                     <td><span class="badge bg-secondary">{{ ucfirst(str_replace('_',' ',$user->role)) }}</span></td>
                     <td>
@@ -71,7 +69,6 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center py-4 text-muted">No users found.</td>
                 </tr>
                 @endforelse
                 </tbody>

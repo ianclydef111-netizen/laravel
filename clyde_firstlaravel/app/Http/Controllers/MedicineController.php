@@ -33,7 +33,8 @@ class MedicineController extends Controller {
             'unit_price' => 'required|numeric|min:0',
             'stock_level' => 'required|integer|min:0',
             'reorder_level' => 'required|integer|min:0',
-            'is_regulated' => 'boolean'
+            'is_regulated' => 'boolean',
+            'supplier_id' => 'required|exists:suppliers,id', // Added validation for supplier_id
         ]);
         $data = $request->except('medicine_id_number');
         $medicine = new Medicine($data);
@@ -60,6 +61,7 @@ class MedicineController extends Controller {
             'generic_name' => 'required',
             'category_id' => 'required|exists:categories,id',
             'unit_price' => 'required|numeric|min:0',
+            'supplier_id' => 'required|exists:suppliers,id', // Added validation for supplier_id
         ]);
         $medicine->update($request->except('medicine_id_number'));
         return redirect()->route('medicines.index')->with('success', 'Medicine updated.');

@@ -8,9 +8,10 @@
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table mb-0">
+        <table class="table mb-0">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Name</th>
                         <th>Description</th>
                         <th>Medicines Count</th>
@@ -20,10 +21,8 @@
                 <tbody>
                     @forelse($categories as $category)
                 <tr>
-                        <td>
-                            <strong>{{ $category->category_id_number_display }}</strong>
-                            <br><small class="text-muted">{{ $category->name }}</small>
-                        </td>
+                        <td><span class="badge bg-primary">{{ $category->category_id_number_display }}</span></td>
+                        <td class="fw-bold">{{ $category->name }}</td>
                         <td>{{ $category->description ?? '-' }}</td>
                         <td><span class="badge bg-info">{{ $category->medicines_count }}</span></td>
                         <td>
@@ -36,7 +35,8 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="text-center py-4 text-muted">No categories found. <a href="{{ route('categories.create') }}">Create one now</a>.</td>
+                        <td colspan="5" class="text-center py-4 text-muted">No categories found. <a href="{{ route('categories.create') }}">Create one now</a>.</td>
+
                     </tr>
                     @endforelse
                 </tbody>

@@ -11,7 +11,9 @@
             <table class="table mb-0">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Medicine</th>
+                        <th>Supplier</th>
                         <th>Batch No</th>
                         <th>Stock Quantity</th>
                         <th>Manufacture Date</th>
@@ -23,10 +25,9 @@
                 <tbody>
                     @forelse($batches ?? [] as $batch)
                     <tr class="{{ now()->diffInDays($batch->expiry_date) < 30 ? 'table-warning' : '' }}">
-                        <td>
-                            <strong>{{ $batch->batch_id_number_display }}</strong>
-                            <br><small class="text-muted">{{ $batch->medicine->generic_name }}</small>
-                        </td>
+                        <td><span class="badge bg-primary">{{ $batch->batch_id_number_display }}</span></td>
+                        <td class="fw-bold">{{ $batch->medicine->generic_name }}</td>
+                        <td><span class="badge bg-secondary">{{ $batch->medicine->supplier->supplier_name ?? 'N/A' }}</span></td>
                         <td>{{ $batch->batch_number }}</td>
                         <td><span class="badge bg-info">{{ $batch->stock_quantity }}</span></td>
                         <td>{{ $batch->manufacture_date ? $batch->manufacture_date->format('M Y') : '-' }}</td>
@@ -49,7 +50,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">No batches. <a href="{{ route('batches.create') }}">Add one</a>.</td>
+                        <td colspan="9" class="text-center py-4 text-muted">No batches. <a href="{{ route('batches.create') }}">Add one</a>.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -58,3 +59,4 @@
     </div>
 </div>
 @endsection
+

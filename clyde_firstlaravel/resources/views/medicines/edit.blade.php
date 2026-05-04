@@ -61,6 +61,13 @@
                     <input type="number" name="reorder_level" class="form-control @error('reorder_level') is-invalid @enderror" value="{{ old('reorder_level', $medicine->reorder_level) }}" min="0">
                 </div>
                 <div class="col-12">
+                    <label class="form-label">Description <span class="text-danger">*</span></label>
+                    <textarea name="description" class="form-control @error('description') is-invalid @enderror" rows="3" required>{{ old('description', $medicine->description) }}</textarea>
+                    @error('description')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-12">
                     <label class="form-check-label">
                         <input type="checkbox" name="is_regulated" class="form-check-input" value="1" {{ old('is_regulated', $medicine->is_regulated) ? 'checked' : '' }}>
                         Regulated Medicine (requires prescription)

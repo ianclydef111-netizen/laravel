@@ -11,6 +11,7 @@
             <table class="table mb-0">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Name</th>
                         <th>Contact</th>
                         <th>Email</th>
@@ -20,25 +21,25 @@
                 </thead>
                 <tbody>
                     @forelse($suppliers ?? [] as $supplier)
-                <tr>
-                        <td>
-                            <strong>{{ $supplier->supplier_id_number_display }}</strong>
-                            <br><small class="text-muted">{{ $supplier->supplier_name }}</small>
-                        </td>
+                    <tr>
+                        <td><span class="badge bg-primary">{{ $supplier->supplier_id_number_display }}</span></td>
+                        <td class="fw-bold">{{ $supplier->supplier_name }}</td>
                         <td>{{ $supplier->contact_no }}</td>
                         <td>{{ $supplier->email ?? '-' }}</td>
                         <td>{{ $supplier->medicines()->count() }}</td>
                         <td>
+                            <a href="{{ route('suppliers.show', $supplier) }}" class="btn btn-sm btn-outline-primary"><i class="fa fa-eye"></i></a>
                             <a href="{{ route('suppliers.edit', $supplier) }}" class="btn btn-sm btn-outline-warning"><i class="fa fa-edit"></i></a>
                             <form method="POST" action="{{ route('suppliers.destroy', $supplier) }}" class="d-inline" onsubmit="return confirm('Delete supplier?')">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger"><i class="fa fa-trash"></i></button>
                             </form>
                         </td>
+
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center py-4 text-muted">No suppliers. <a href="{{ route('suppliers.create') }}">Add one</a>.</td>
+                        <td colspan="6" class="text-center py-4 text-muted">No suppliers. <a href="{{ route('suppliers.create') }}">Add one</a>.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -47,3 +48,4 @@
     </div>
 </div>
 @endsection
+

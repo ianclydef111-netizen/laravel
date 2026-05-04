@@ -24,7 +24,7 @@
                 <tbody>
                     @forelse($sales ?? [] as $sale)
                     <tr>
-                        <td><strong>#{{ $sale->id }}</strong></td>
+<td><span class="badge bg-primary">{{ $sale->sale_id_number ?? $sale->id }}</span></td>
                         <td>{{ $sale->user->name }}</td>
                         <td>{{ $sale->customer_name ?? 'Walk-in' }}</td>
                         <td>{{ $sale->sale_date->format('M d') }}</td>

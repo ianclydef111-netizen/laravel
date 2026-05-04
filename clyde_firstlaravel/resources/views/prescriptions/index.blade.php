@@ -12,25 +12,26 @@
 
                 <thead class="table-light">
                     <tr class="align-middle">
-                        <th style="width: 15%;">Patient</th>
-                        <th style="width: 15%;">Doctor</th>
+                        <th style="width: 12%;">ID</th>
+                        <th style="width: 13%;">Patient</th>
+                        <th style="width: 13%;">Doctor</th>
                         <th style="width: 10%;">Date</th>
                         <th style="width: 10%;">File</th>
-                        <th style="width: 20%;">Medicines</th>
+                        <th style="width: 18%;">Medicines</th>
                         <th style="width: 8%;">Status</th>
-                        <th style="width: 12%;">Notes</th>
-                        <th style="width: 10%;">Actions</th>
+                        <th style="width: 10%;">Notes</th>
+                        <th style="width: 6%;">Actions</th>
                     </tr>
                 </thead>
+
 
                 <tbody>
                     @forelse($prescriptions ?? [] as $prescription)
 
                     <tr class="align-middle">
-                        <td class="fw-medium">
-                            {{ $prescription->prescription_id_number_display }}
-                            <br><small class="text-muted">{{ $prescription->patient_name }}</small>
-                        </td>
+                        <td><span class="badge bg-primary">{{ $prescription->prescription_id_number_display }}</span></td>
+                        <td class="fw-medium">{{ $prescription->patient_name }}</td>
+
                         <td>{{ $prescription->doctor_name }}</td>
                         <td>{{ $prescription->prescription_date->format('M d') }}</td>
                         <td>
@@ -67,7 +68,8 @@
 
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">No prescriptions. <a href="{{ route('prescriptions.create') }}">Add one</a>.</td>
+                        <td colspan="8" class="text-center py-4 text-muted">No prescriptions. <a href="{{ route('prescriptions.create') }}">Add one</a>.</td>
+
                     </tr>
                     @endforelse
                 </tbody>

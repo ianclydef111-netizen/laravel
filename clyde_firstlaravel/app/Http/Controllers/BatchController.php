@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class BatchController extends Controller {
     public function index(Request $request) {
-        $query = Batch::with('medicine');
+$query = Batch::with('medicine.supplier');
         if ($request->filled('search')) $query->whereHas('medicine', fn($q) => $q->where('generic_name', 'like', '%'.$request->search.'%'));
         if ($request->filled('expiry_status')) {
             if ($request->expiry_status === 'expired') $query->where('expiry_date', '<', now());
@@ -19,7 +19,7 @@ class BatchController extends Controller {
     }
 
     public function create() {
-        $medicines = Medicine::all();
+        $medicines = Medicine::with('supplier', 'category')->get();
         return view('batches.create', compact('medicines'));
     }
 
@@ -28,6 +28,7 @@ class BatchController extends Controller {
             'medicine_id' => 'required|exists:medicines,id',
             'batch_number' => 'required',
             'expiry_date' => 'required|date',
+            'manufacture_date' => 'nullable|date', // Added validation for manufacture_date
             'stock_quantity' => 'required|integer|min:1',
         ]);
         $batch = Batch::create($request->all());

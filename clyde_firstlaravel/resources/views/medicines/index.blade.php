@@ -27,7 +27,11 @@
     </div>
     <div class="card-body p-0">
         <table class="table mb-0">
-<th>ID</th><th>Generic Name</th><th>Brand</th><th>Category</th><th>Price</th><th>Stock</th><th>Regulated</th><th>Actions</th>
+            <thead>
+                <tr>
+                    <th>ID</th><th>Generic Name</th><th>Brand</th><th>Category</th><th>Price</th><th>Stock</th><th>Regulated</th><th>Actions</th>
+                </tr>
+            </thead>
             <tbody>
             @forelse($medicines as $med)
             <tr class="{{ $med->isLowStock() ? 'table-warning' : '' }}">
@@ -35,7 +39,11 @@
                 <td class="fw-bold">{{ $med->generic_name }}</td>
 
                 <td>{{ $med->brand_name ?? '-' }}</td>
-                <td><span class="badge bg-info">{{ $med->category->name }}</span></td>
+                <td>
+                    <a href="{{ route('categories.show', $med->category_id) }}" class="badge bg-info text-decoration-none">
+                        <i class="fa fa-eye me-1"></i>{{ $med->category->name }}
+                    </a>
+                </td>
                 <td>₱{{ number_format($med->unit_price,2) }}</td>
                 <td>
                     {{ $med->stock_level }}
@@ -53,7 +61,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="7" class="text-center py-4">
+                <td colspan="8" class="text-center py-4">
                     No medicines yet. <a href="{{ route('medicines.create') }}">Add first medicine</a>.
                 </td>
             </tr>

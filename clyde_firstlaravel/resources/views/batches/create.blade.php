@@ -32,9 +32,9 @@
                     <label class="form-label">Medicine <span class="text-danger">*</span></label>
                     <select name="medicine_id" class="form-select @error('medicine_id') is-invalid @enderror" required>
                         <option value="">Select Medicine</option>
-                        @foreach(App\Models\Medicine::with('category')->get() as $med)
+@foreach($medicines as $med)
                             <option value="{{ $med->id }}" {{ old('medicine_id') == $med->id ? 'selected' : '' }}>
-                                {{ $med->generic_name }} - {{ $med->category->name }}
+                                {{ $med->generic_name }} - {{ $med->category->name }} ({{ $med->supplier->supplier_name ?? 'N/A' }})
                             </option>
                         @endforeach
                     </select>
