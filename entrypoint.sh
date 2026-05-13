@@ -1,59 +1,28 @@
 #!/bin/bash
 
-echo "======================================="
-echo "Starting Laravel Application Startup"
-echo "======================================="
+echo "Starting Laravel Application..."
 
-# Wait for database to be ready (max 120 seconds)
-echo "Waiting for database connection..."
-MAX_ATTEMPTS=60
-ATTEMPT=0
+# Give database a moment to be ready
+sleep 5
 
-while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-  if php -r "
-    \$host = getenv('DB_HOST');
-    \$port = getenv('DB_PORT') ?: 3306;
-    \$timeout = 3;
-    \$connection = @fsockopen(\$host, \$port, \$errno, \$errstr, \$timeout);
-    if (\$connection) {
-      fclose(\$connection);
-      exit(0);
-    }
-    exit(1);
-  " 2>/dev/null; then
-    echo "✓ Database is ready!"
-    break
-  fi
-  ATTEMPT=$((ATTEMPT + 1))
-  echo "Attempt $ATTEMPT/$MAX_ATTEMPTS: Waiting for database..."
-  sleep 2
-done
+# Run PHP script to ensure database tables exist
+echo "Ensuring critical database tables exist..."
+php /var/www/html/scripts/ensure-db.php || true
 
-if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
-  echo "⚠ Warning: Database connection timeout, continuing anyway..."
-fi
-
-# Run database migrations
+# Run migrations with detailed output
 echo "Running database migrations..."
-php artisan migrate --force --no-interaction 2>&1 || echo "⚠ Migration had issues, continuing..."
+php artisan migrate --force || true
 
-# Clear application caches
-echo "Clearing application caches..."
-php artisan config:clear 2>&1 || true
-php artisan route:clear 2>&1 || true
-php artisan view:clear 2>&1 || true
-php artisan cache:clear 2>&1 || true
+# Clear caches
+echo "Clearing caches..."
+php artisan config:clear || true
+php artisan route:clear || true
+php artisan view:clear || true
 
-# Set proper permissions
-echo "Setting storage permissions..."
-mkdir -p /var/www/html/storage/framework/{cache,sessions,views}
-mkdir -p /var/www/html/storage/logs
-mkdir -p /var/www/html/bootstrap/cache
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>&1 || true
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>&1 || true
+# Set permissions
+echo "Setting permissions..."
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache || true
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache || true
 
-echo "======================================="
-echo "✓ Application Ready! Starting Apache..."
-echo "======================================="
-
-exec apache2-foreground
+echo "Starting Apache..."
+apache2-foreground

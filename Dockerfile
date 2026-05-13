@@ -44,6 +44,10 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# Copy helper scripts
+COPY scripts/ /var/www/html/scripts/
+RUN chmod +x /var/www/html/scripts/*.php || true
+
 # Install frontend dependencies and build assets
 RUN npm install && npm run build 2>&1 || echo "Warning: npm build had issues but continuing..."
 
