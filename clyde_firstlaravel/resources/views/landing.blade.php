@@ -52,7 +52,7 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6 hero-text">
-                <h1><span>Pharmastream</span> Management System</h1>
+                <h1><span>Pharmastream</span> Pharmacy Management System</h1>
                 <p>Streamline your pharmacy operations with our all-in-one system. Manage inventory, sales, prescriptions, and staff &mdash; all in one place.</p>
                 <div class="hero-btns">
                     <a href="{{ route('login') }}" class="btn btn-outline-white">Get Started</a>

@@ -20,13 +20,16 @@ class DashboardController extends Controller {
             $data['year_sales'] = Sale::whereYear('sale_date', now()->year)->sum('total_price');
             $data['total_medicines'] = Medicine::count();
             $data['low_stock'] = Medicine::whereColumn('stock_level', '<=', 'reorder_level')->count();
+            $data['expiring_batches'] = Batch::where('expiry_date', '>', now())->where('expiry_date', '<=', now()->addDays(30))->count();
+            $data['expiring_soon_list'] = Batch::with('medicine')->where('expiry_date', '>', now())->where('expiry_date', '<=', now()->addDays(30))->get();
             $data['recent_sales'] = Sale::with('user')->latest()->take(5)->get();
             $data['pending_prescriptions'] = Prescription::where('status', 'pending')->count();
         }
 
         if ($user->isPharmacist()) {
             $data['low_stock'] = Medicine::whereColumn('stock_level', '<=', 'reorder_level')->count();
-            $data['expiring_batches'] = Batch::where('expiry_date', '<=', now()->addDays(30))->count();
+            $data['expiring_batches'] = Batch::where('expiry_date', '>', now())->where('expiry_date', '<=', now()->addDays(30))->count();
+            $data['expiring_soon_list'] = Batch::with('medicine')->where('expiry_date', '>', now())->where('expiry_date', '<=', now()->addDays(30))->get();
             $data['pending_prescriptions'] = Prescription::where('status', 'pending')->count();
             $data['total_medicines'] = Medicine::count();
         }

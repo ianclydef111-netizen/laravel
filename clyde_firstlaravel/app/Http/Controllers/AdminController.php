@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Medicine;
 use App\Models\Sale;
+use App\Models\Batch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,6 +15,8 @@ class AdminController extends Controller {
             'total_medicines' => Medicine::count(),
             'low_stock' => Medicine::whereColumn('stock_level', '<=', 'reorder_level')->count(),
             'today_sales' => Sale::whereDate('sale_date', today())->sum('total_price'),
+            'expiring_soon' => Batch::whereBetween('expiry_date', [now(), now()->addDays(30)])->count(),
+            'expiring_soon_list' => Batch::with('medicine')->whereBetween('expiry_date', [now(), now()->addDays(30)])->get(),
         ];
         return view('admin.dashboard', compact('stats'));
     }
@@ -56,4 +59,3 @@ class AdminController extends Controller {
         return back()->with('success', "User {$user->name} has been deleted.");
     }
 }
-

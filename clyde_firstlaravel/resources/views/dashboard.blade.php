@@ -24,6 +24,96 @@
     @endif
 </div>
 
+@if(auth()->user()->isAdmin() || auth()->user()->isPharmacist())
+@if(count($data['expiring_soon_list']) > 0)
+<div class="card mb-4">
+<div class="card-header py-3 d-flex align-items-center">
+<i class="fa fa-exclamation-triangle text-warning me-2"></i>
+Expiring Medicines (within 30 days)
+<span class="badge bg-warning ms-auto">{{ $data['expiring_batches'] }} batch{{ $data['expiring_batches'] > 1 ? 'es' : '' }}</span>
+</div>
+<div class="card-body p-0">
+<div class="table-responsive">
+<table class="table mb-0 table-hover">
+<thead class="table-light">
+<tr>
+<th>Medicine</th>
+<th>Batch #</th>
+<th>Expiry Date</th>
+<th>Days Left / Status</th>
+<th>Available Stock</th>
+</tr>
+</thead>
+<tbody>
+@foreach($data['expiring_soon_list'] as $batch)
+@php
+    // 1. Ensure we only compare dates, not times, to avoid decimals/partial days
+    $now = now()->startOfDay(); 
+    $expiryDate = $batch->expiry_date->startOfDay(); 
+    
+    // 2. Use diffInDays. A negative result means the expiry date is in the past.
+    // We compare ($now) to ($expiryDate). 
+    // If $expiry is May 30 and $now is May 29, $daysLeft will be 1.
+    $daysLeft = $now->diffInDays($expiryDate, false); 
+
+    $badgeClass = '';
+    $badgeText = '';
+    $trClass = '';
+
+    if ($daysLeft < 0) { 
+        // Logic: Expiry date is before today
+        $badgeClass = 'bg-danger';
+        $badgeText = 'Expired';
+        $trClass = 'table-danger';
+    } elseif ($daysLeft == 0) { 
+        // Logic: Expiry date is exactly today
+        $badgeClass = 'bg-danger';
+        $badgeText = 'Expires Today';
+        $trClass = 'table-danger';
+    } elseif ($daysLeft <= 7) { 
+        // Logic: 1 to 7 days remaining
+        $badgeClass = 'bg-danger';
+        $badgeText = $daysLeft . ' days left';
+        $trClass = 'table-danger';
+    } elseif ($daysLeft <= 14) { 
+        // Logic: 8 to 14 days remaining
+        $badgeClass = 'bg-warning text-dark';
+        $badgeText = $daysLeft . ' days left';
+        $trClass = 'table-warning';
+    } else { 
+        // Logic: 15 to 30 days remaining
+        $badgeClass = 'bg-info text-dark';
+        $badgeText = $daysLeft . ' days left';
+        $trClass = 'table-info';
+    }
+@endphp
+<tr class="{{ $trClass }}">
+    <td>
+        <strong>{{ $batch->medicine->generic_name }}</strong><br>
+        <small class="text-muted">{{ $batch->medicine->brand_name }}</small>
+    </td>
+    <td><code>{{ $batch->batch_number }}</code></td>
+    <td>{{ $batch->expiry_date->format('M d, Y') }}</td>
+    <td>
+        <span class="badge {{ $badgeClass }}">
+            {{ $badgeText }}
+        </span>
+    </td>
+    <td>{{ number_format($batch->stock_quantity) }}</td>
+</tr>
+@endforeach
+</tbody>
+</table>
+</div>
+</div>
+</div>
+@else
+<div class="alert alert-success mb-4">
+<i class="fa fa-check-circle"></i> Great! No medicines are expiring within the next 30 days.
+</div>
+@endif
+@endif
+
 @if(isset($data['recent_sales']))
 <div class="card"><div class="card-header py-3">Recent Sales</div>
 <div class="card-body p-0">
@@ -40,4 +130,3 @@
 </div></div>
 @endif
 @endsection
-

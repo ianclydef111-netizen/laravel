@@ -15,7 +15,7 @@ class CategoryController extends Controller {
     public function create() { return view('categories.create'); }
 
     public function store(Request $request) {
-        $request->validate(['name' => 'required|unique:categories', 'description' => 'nullable']);
+        $request->validate(['name' => 'required|unique:categories', 'description' => 'required']);
         $category = Category::create($request->only('name', 'description'));
         $category->category_id_number = 'CAT' . str_pad($category->id, 3, '0', STR_PAD_LEFT);
         $category->save();
@@ -25,7 +25,7 @@ class CategoryController extends Controller {
     public function edit(Category $category) { return view('categories.edit', compact('category')); }
 
     public function update(Request $request, Category $category) {
-        $request->validate(['name' => 'required|unique:categories,name,' . $category->id, 'description' => 'nullable']);
+        $request->validate(['name' => 'required|unique:categories,name,' . $category->id, 'description' => 'required']);
         $category->update($request->only('name', 'description'));
         return redirect()->route('categories.index')->with('success', 'Category updated.');
     }
@@ -33,5 +33,12 @@ class CategoryController extends Controller {
     public function destroy(Category $category) {
         $category->delete();
         return back()->with('success', 'Category deleted.');
+    }
+
+    public function show(Category $category) {
+        $category->load(['medicines' => function($query) {
+            $query->with(['supplier', 'category']);
+        }]);
+        return view('categories.show', compact('category'));
     }
 }

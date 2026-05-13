@@ -7,9 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-body { background: linear-gradient(135deg, #0ba8ff, #c687ff); min-height: 100vh; display: flex; align-items: center; }
-
-
+     body { background: url('https://img.freepik.com/premium-photo/closeup-digital-prescription-being-filled-processed-through-online-pharmacy_995578-18135.jpg') center/cover no-repeat; min-height: 100vh; display: flex; align-items: center; position: relative; }
+        body::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.55); pointer-events: none; z-index: 0; }
 
         .card { border: 2px solid white; border-radius: 20px; background: transparent; color: white; backdrop-filter: blur(10px); }
         .card .text-muted { color: rgba(255,255,255,0.85) !important; }
@@ -44,11 +43,7 @@ body { background: linear-gradient(135deg, #0ba8ff, #c687ff); min-height: 100vh;
 
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Your ID Number</label>
-                        <input type="text" class="form-control id-display bg-transparent border-0 text-center fw-bold" readonly value="USR{{ str_pad(rand(1,999), 3, '0', STR_PAD_LEFT) }}">
-                        <small class="text-muted">Auto-generated ID - shown after registration</small>
-                    </div>
+                  
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Full Name</label>
                         <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
