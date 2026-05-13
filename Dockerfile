@@ -71,5 +71,5 @@ RUN mkdir -p /var/www/html/storage/framework/{cache,sessions,views} \
 # Expose port
 EXPOSE 10000
 
-# Start with entrypoint script
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+# Use CMD instead of ENTRYPOINT for better compatibility
+CMD ["/bin/bash", "-c", "php /var/www/html/scripts/ensure-db.php && php artisan migrate --force || true && apache2-foreground"]
