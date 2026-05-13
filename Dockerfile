@@ -72,4 +72,4 @@ RUN mkdir -p /var/www/html/storage/framework/{cache,sessions,views} \
 EXPOSE 10000
 
 # Use CMD instead of ENTRYPOINT for better compatibility
-CMD ["/bin/bash", "-c", "php /var/www/html/scripts/ensure-db.php && php artisan migrate --force && php /var/www/html/scripts/seed-if-needed.php && apache2-foreground"]
+CMD ["/bin/bash", "-c", "php /var/www/html/scripts/ensure-db.php && php artisan migrate --force 2>&1 || true && php artisan db:seed --force 2>&1 || true && apache2-foreground"]
