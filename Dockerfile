@@ -46,11 +46,9 @@ RUN php artisan config:clear \
 && php artisan view:clear
 # Create storage symlink
 RUN php artisan storage:link || true
-# Fix permissions
-RUN mkdir -p storage/framework/cache storage/framework/sessions \
-storage/framework/views bootstrap/cache public/uploads \
-&& chown -R www-data:www-data storage bootstrap/cache public/uploads \
-&& chmod -R 775 storage bootstrap/cache public/uploads
+# Fix permissions using the correct working directory path
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 # (Optional) Run migrations
 RUN php artisan migrate --force || true
 # Expose port
