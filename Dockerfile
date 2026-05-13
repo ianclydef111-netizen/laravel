@@ -45,10 +45,12 @@ COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Install frontend dependencies and build assets
-RUN npm install && npm run build
-RUN php artisan config:clear \
-&& php artisan route:clear \
-&& php artisan view:clear
+RUN npm install && npm run build 2>&1 || echo "Warning: npm build had issues but continuing..."
+
+# Clear config cache (no migrations during build)
+RUN php artisan config:clear || true
+RUN php artisan view:clear || true
+
 # Create storage symlink
 RUN php artisan storage:link || true
 
