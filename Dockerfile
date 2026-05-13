@@ -57,6 +57,3 @@ RUN php artisan migrate --force || true
 EXPOSE 10000
 # Start Apache
 CMD ["apache2-foreground"]
-# Ensure storage and bootstrap/cache are writable
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
