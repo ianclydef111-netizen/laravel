@@ -10,8 +10,9 @@ libzip-dev \
 libonig-dev \
 libxml2-dev \
 libpng-dev \
+libgd-dev \
 zip \
-&& docker-php-ext-install pdo pdo_mysql pdo_pgsql zip mbstring xml \
+&& docker-php-ext-install pdo pdo_mysql pdo_pgsql zip mbstring xml gd \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/*
 # Enable Apache rewrite
@@ -39,6 +40,10 @@ WORKDIR /var/www/html
 COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Copy entrypoint script
+COPY entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Install frontend dependencies and build assets
 RUN npm install && npm run build
 RUN php artisan config:clear \
@@ -46,12 +51,19 @@ RUN php artisan config:clear \
 && php artisan view:clear
 # Create storage symlink
 RUN php artisan storage:link || true
-# Fix permissions using the correct working directory path
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-# (Optional) Run migrations
-RUN php artisan migrate --force || true
+
+# Fix permissions - create directories and set ownership
+RUN mkdir -p /var/www/html/storage/framework/{cache,sessions,views} \
+&& mkdir -p /var/www/html/storage/logs \
+&& mkdir -p /var/www/html/bootstrap/cache \
+&& mkdir -p /var/www/html/public/uploads \
+&& chown -R www-data:www-data /var/www/html \
+&& chmod -R 775 /var/www/html/storage \
+&& chmod -R 775 /var/www/html/bootstrap/cache \
+&& chmod -R 755 /var/www/html/public
+
 # Expose port
 EXPOSE 10000
-# Start Apache
-CMD ["apache2-foreground"]
+
+# Start with entrypoint script
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
