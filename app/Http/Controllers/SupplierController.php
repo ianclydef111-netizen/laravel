@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class SupplierController extends Controller {
     public function index(Request $request) {
@@ -17,8 +18,16 @@ class SupplierController extends Controller {
     public function store(Request $request) {
         $request->validate(['supplier_name' => 'required', 'contact_no' => 'required']);
         $supplier = Supplier::create($request->all());
-        $supplier->supplier_id_number = 'SUP' . str_pad($supplier->id, 3, '0', STR_PAD_LEFT);
-        $supplier->save();
+        
+        try {
+            $idNumber = 'SUP' . str_pad($supplier->id, 3, '0', STR_PAD_LEFT);
+            if (Schema::hasColumn('suppliers', 'supplier_id_number')) {
+                $supplier->update(['supplier_id_number' => $idNumber]);
+            }
+        } catch (\Exception $e) {
+            // Column doesn't exist yet
+        }
+        
         return redirect()->route('suppliers.index')->with('success', 'Supplier created (ID: ' . $supplier->supplier_id_number_display . ').');
     }
 

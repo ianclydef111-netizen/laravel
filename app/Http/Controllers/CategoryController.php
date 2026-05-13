@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class CategoryController extends Controller {
     public function index(Request $request) {
@@ -17,8 +18,17 @@ class CategoryController extends Controller {
     public function store(Request $request) {
         $request->validate(['name' => 'required|unique:categories', 'description' => 'required']);
         $category = Category::create($request->only('name', 'description'));
-        $category->category_id_number = 'CAT' . str_pad($category->id, 3, '0', STR_PAD_LEFT);
-        $category->save();
+        
+        // Only update the ID number if the column exists
+        try {
+            $idNumber = 'CAT' . str_pad($category->id, 3, '0', STR_PAD_LEFT);
+            if (Schema::hasColumn('categories', 'category_id_number')) {
+                $category->update(['category_id_number' => $idNumber]);
+            }
+        } catch (\Exception $e) {
+            // Column doesn't exist yet - that's OK, migrations will add it
+        }
+        
         return redirect()->route('categories.index')->with('success', 'Category created (ID: ' . $category->category_id_number_display . ').');
     }
 

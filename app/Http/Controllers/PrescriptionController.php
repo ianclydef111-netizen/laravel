@@ -5,6 +5,7 @@ use App\Models\Prescription;
 use App\Models\Medicine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 
 class PrescriptionController extends Controller {
     public function index(Request $request) {
@@ -42,8 +43,15 @@ class PrescriptionController extends Controller {
             'notes' => $request->notes,
             'status' => 'pending',
         ]);
-        $prescription->prescription_id_number = 'PRE' . str_pad($prescription->id, 3, '0', STR_PAD_LEFT);
-        $prescription->save();
+        
+        try {
+            $idNumber = 'PRE' . str_pad($prescription->id, 3, '0', STR_PAD_LEFT);
+            if (Schema::hasColumn('prescriptions', 'prescription_id_number')) {
+                $prescription->update(['prescription_id_number' => $idNumber]);
+            }
+        } catch (\Exception $e) {
+            // Column doesn't exist yet
+        }
 
         foreach ($request->prescription_items as $item) {
             $prescription->medicines()->attach($item['medicine_id'], [

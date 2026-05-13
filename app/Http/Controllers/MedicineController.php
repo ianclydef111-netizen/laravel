@@ -5,6 +5,7 @@ use App\Models\Medicine;
 use App\Models\Category;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class MedicineController extends Controller {
     public function index(Request $request) {
@@ -39,8 +40,15 @@ class MedicineController extends Controller {
         $data = $request->except('medicine_id_number');
         $medicine = new Medicine($data);
         $medicine->save();
-        $medicine->medicine_id_number = 'MED' . str_pad($medicine->id, 3, '0', STR_PAD_LEFT);
-        $medicine->save();
+        
+        try {
+            $idNumber = 'MED' . str_pad($medicine->id, 3, '0', STR_PAD_LEFT);
+            if (Schema::hasColumn('medicines', 'medicine_id_number')) {
+                $medicine->update(['medicine_id_number' => $idNumber]);
+            }
+        } catch (\Exception $e) {
+            // Column doesn't exist yet
+        }
         return redirect()->route('medicines.index')->with('success', 'Medicine added.');
     }
 

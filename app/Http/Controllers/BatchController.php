@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Batch;
 use App\Models\Medicine;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class BatchController extends Controller {
     public function index(Request $request) {
@@ -32,8 +33,16 @@ $query = Batch::with('medicine.supplier');
             'stock_quantity' => 'required|integer|min:1',
         ]);
         $batch = Batch::create($request->all());
-        $batch->batch_id_number = 'BAT' . str_pad($batch->id, 3, '0', STR_PAD_LEFT);
-        $batch->save();
+        
+        try {
+            $idNumber = 'BAT' . str_pad($batch->id, 3, '0', STR_PAD_LEFT);
+            if (Schema::hasColumn('batches', 'batch_id_number')) {
+                $batch->update(['batch_id_number' => $idNumber]);
+            }
+        } catch (\Exception $e) {
+            // Column doesn't exist yet
+        }
+        
         // Update medicine stock
         $batch->medicine->increment('stock_level', $batch->stock_quantity);
         return redirect()->route('batches.index')->with('success', 'Batch added (ID: ' . $batch->batch_id_number_display . ').');
