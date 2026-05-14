@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Schema;
 
 class RegisterController extends Controller {
     public function showRegistrationForm() {
@@ -27,8 +28,18 @@ class RegisterController extends Controller {
             'role' => $request->role,
             'status' => 'pending', // Needs admin approval
         ]);
-        $user->user_id_number = 'USR' . str_pad($user->id, 3, '0', STR_PAD_LEFT);
-        $user->save();
+        
+        // Only set user_id_number if the column exists.
+        // In some deployments (e.g. fresh DB), the column may not be migrated yet.
+        try {
+            if (Schema::hasColumn('users', 'user_id_number')) {
+                $idNumber = 'USR' . str_pad($user->id, 3, '0', STR_PAD_LEFT);
+                $user->update(['user_id_number' => $idNumber]);
+            }
+        } catch (\Throwable $e) {
+            // Ignore: column might not exist yet.
+        }
+
 
         return redirect()->route('login')
             ->with('success', 'Registration submitted! Please wait for admin approval before logging in.');

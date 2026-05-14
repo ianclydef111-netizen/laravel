@@ -71,16 +71,5 @@ RUN mkdir -p /var/www/html/storage/framework/{cache,sessions,views} \
 # Expose port
 EXPOSE 10000
 
-# Use CMD instead of ENTRYPOINT for better compatibility
-CMD ["/bin/bash", "-c", "\
-  echo 'Setting permissions...' && \
-  mkdir -p /var/www/html/storage/{framework,logs} && \
-  mkdir -p /var/www/html/bootstrap/cache && \
-  chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
-  chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache && \
-  echo 'Running database setup...' && \
-  php /var/www/html/scripts/ensure-db.php && \
-  php artisan migrate --force 2>&1 || true && \
-  php artisan db:seed --force 2>&1 || true && \
-  echo 'Starting Apache...' && \
-  apache2-foreground"]
+# Use CMD to call the entrypoint script
+CMD ["/bin/bash", "/usr/local/bin/entrypoint.sh"]

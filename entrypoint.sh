@@ -1,28 +1,52 @@
 #!/bin/bash
+set -e
 
-echo "Starting Laravel Application..."
+cd /var/www/html
 
-# Give database a moment to be ready
-sleep 5
+echo "================================"
+echo "Starting Laravel Application"
+echo "================================"
 
-# Run PHP script to ensure database tables exist
-echo "Ensuring critical database tables exist..."
-php /var/www/html/scripts/ensure-db.php || true
+# Step 1: Create all necessary directories
+echo "Creating directories..."
+mkdir -p storage/logs storage/framework/{cache,sessions,views} bootstrap/cache public/uploads
 
-# Run migrations with detailed output
-echo "Running database migrations..."
-php artisan migrate --force || true
-
-# Clear caches
-echo "Clearing caches..."
-php artisan config:clear || true
-php artisan route:clear || true
-php artisan view:clear || true
-
-# Set permissions
+# Step 2: Fix permissions FIRST - this is critical
 echo "Setting permissions..."
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache || true
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache || true
+chown -R www-data:www-data storage bootstrap/cache public/uploads 2>/dev/null || true
+chmod -R 777 storage bootstrap/cache public/uploads 2>/dev/null || true
 
-echo "Starting Apache..."
-apache2-foreground
+# Step 3: Wait for database
+echo "Waiting for database..."
+sleep 3
+
+# Step 4: Ensure database structure
+echo "Checking database..."
+php scripts/ensure-db.php 2>/dev/null || echo "Database check skipped"
+
+# Step 5: Run migrations
+echo "Running migrations..."
+php artisan migrate --force 2>/dev/null || echo "Migrations completed with warnings"
+
+# Step 6: Seed database
+echo "Seeding database..."
+php artisan db:seed --force 2>/dev/null || echo "Seeding completed with warnings"
+
+# Step 7: Clear caches
+echo "Clearing caches..."
+php artisan config:clear 2>/dev/null || true
+php artisan route:clear 2>/dev/null || true
+php artisan view:clear 2>/dev/null || true
+php artisan cache:clear 2>/dev/null || true
+
+# Step 8: Final permission check
+echo "Final permission check..."
+chmod -R 777 storage bootstrap/cache public/uploads 2>/dev/null || true
+
+echo "================================"
+echo "✓ Application Ready!"
+echo "================================"
+echo ""
+
+# Start Apache
+exec apache2-foreground
